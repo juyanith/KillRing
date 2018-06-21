@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
@@ -78,6 +79,8 @@ namespace WpfUI.ViewModels
         {
             Debug.WriteLine("SetClipboard.");
 
+            setText = ClipText;
+            lastUpdateTime = DateTime.Now;
             Clipboard.SetText(ClipText);
         }
 
@@ -90,20 +93,26 @@ namespace WpfUI.ViewModels
                 var text = Clipboard.GetText();
                 Debug.WriteLine($"    text = '{text}'.");
 
-                // If timeout expired replace clip text with current text, otherwise append.
-                if (ClipText == null || (DateTime.Now - lastUpdateTime) > TimeSpan.FromSeconds(Timeout))
+                var now = DateTime.Now;
+
+                // If timeout expired replace clip text with current text
+                if ((now - lastUpdateTime) > TimeSpan.FromSeconds(Timeout))
                 {
                     ClipText = text;
+                    lastUpdateTime = now;
+                    setText = null;
                 }
-                else
+                // otherwise if this is not a callback from SetClipboard append the text to clip text.
+                else if (text != setText)
                 {
                     ClipText += (Separator + text);
-                }
-
-                lastUpdateTime = DateTime.Now;
+                    lastUpdateTime = now;
+                    setText = null;
+                }    
             }
         }
 
         private DateTime lastUpdateTime = DateTime.MinValue;
+        private string setText;
     }
 }
