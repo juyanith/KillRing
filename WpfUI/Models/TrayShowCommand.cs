@@ -26,13 +26,11 @@ namespace WpfUI.Models
                 if (window.WindowState == WindowState.Minimized)
                 {
                     window.WindowState = WindowState.Normal;
-                    window.ShowInTaskbar = true;
                     window.Show();
                     window.Activate();
                 }
                 else
                 {
-                    window.ShowInTaskbar = false;
                     window.Hide();
                     window.WindowState = WindowState.Minimized;
                 }

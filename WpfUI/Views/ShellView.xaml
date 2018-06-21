@@ -13,8 +13,9 @@
         cal:Bind.AtDesignTime="True"
         Title="{Binding ViewTitle}" 
         Height="300" Width="800"
-        SourceInitialized="Window_SourceInitialized"
-        Closed="Window_Closed"
+        SourceInitialized="ShellWindow_SourceInitialized"
+        Closed="ShellWindow_Closed"
+        StateChanged="ShellWindow_StateChanged"
         x:Name="ShellWindow">
     <Window.Resources>
         <model:TrayShowCommand x:Key="TrayShowCommand"/>

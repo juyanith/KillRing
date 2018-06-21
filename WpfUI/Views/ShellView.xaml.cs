@@ -83,7 +83,7 @@ namespace WpfUI.Views
             return IntPtr.Zero;
         }
 
-        private void Window_SourceInitialized(object sender, EventArgs e)
+        private void ShellWindow_SourceInitialized(object sender, EventArgs e)
         {
             windowHandle = new WindowInteropHelper(this).EnsureHandle();
             HwndSource.FromHwnd(windowHandle)?.AddHook(HwndHandler);
@@ -91,11 +91,16 @@ namespace WpfUI.Views
             RegisterHotKeys();
         }
 
-        private void Window_Closed(object sender, EventArgs e)
+        private void ShellWindow_Closed(object sender, EventArgs e)
         {
             UnregisterHotKeys();
             ClipboardMonitorStop();
             HwndSource.FromHwnd(windowHandle)?.RemoveHook(HwndHandler);
+        }
+
+        private void ShellWindow_StateChanged(object sender, EventArgs e)
+        {
+            ShowInTaskbar = WindowState != WindowState.Minimized;
         }
 
         private IntPtr windowHandle;
