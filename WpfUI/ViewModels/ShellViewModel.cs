@@ -123,7 +123,8 @@ namespace WpfUI.ViewModels
         {
             if (!allowExit)
             {
-                // Notify user
+                var result = MessageBox.Show("Are you sure? This will turn off Kill Ring.\n\nClick 'OK' to exit application.", "Confirm Exit", MessageBoxButton.OKCancel);
+                allowExit = result == MessageBoxResult.OK;
             }
 
             callback(allowExit); // will cancel close unless allowExit is true
