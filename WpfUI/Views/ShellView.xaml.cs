@@ -26,6 +26,10 @@ namespace WpfUI.Views
         public ShellView()
         {
             InitializeComponent();
+
+            // Start minimized.
+            Hide();
+            WindowState = WindowState.Minimized;
         }
 
         public void ClipboardMonitorStart()
