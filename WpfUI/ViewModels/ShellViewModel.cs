@@ -75,6 +75,12 @@ namespace WpfUI.ViewModels
             ClipText = null;
         }
 
+        public void Exit()
+        {
+            allowExit = true;
+            TryClose();
+        }
+
         public void SetClipboard()
         {
             Debug.WriteLine("SetClipboard.");
@@ -112,7 +118,18 @@ namespace WpfUI.ViewModels
             }
         }
 
+        public override void CanClose(Action<bool> callback)
+        {
+            if (!allowExit)
+            {
+                // Notify user
+            }
+
+            callback(allowExit); // will cancel close unless allowExit is true
+        }
+
         private DateTime lastUpdateTime = DateTime.MinValue;
         private string setText;
+        private bool allowExit;
     }
 }
