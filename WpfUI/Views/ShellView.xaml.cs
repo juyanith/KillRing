@@ -30,6 +30,7 @@ namespace WpfUI.Views
             // Start minimized.
             Hide();
             WindowState = WindowState.Minimized;
+            ShowInTaskbar = false;
         }
 
         public void ClipboardMonitorStart()
