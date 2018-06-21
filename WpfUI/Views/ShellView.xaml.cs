@@ -43,14 +43,16 @@ namespace WpfUI.Views
             NativeMethods.RemoveClipboardFormatListener(windowHandle);
         }
 
-        public void RegisterHotKey()
+        public void RegisterHotKeys()
         {
-            NativeMethods.RegisterHotKey(windowHandle, NativeMethods.HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT, NativeMethods.VK_V);
+            NativeMethods.RegisterHotKey(windowHandle, CLEAR_TEXT_HOTKEY_ID, NativeMethods.MOD_ALT | NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_DELETE);
+            NativeMethods.RegisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_V);
         }
 
-        public void UnregisterHotKey()
+        public void UnregisterHotKeys()
         {
-            NativeMethods.UnregisterHotKey(windowHandle, NativeMethods.HOTKEY_ID);
+            NativeMethods.UnregisterHotKey(windowHandle, CLEAR_TEXT_HOTKEY_ID);
+            NativeMethods.UnregisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID);
         }
 
         private IntPtr HwndHandler(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
@@ -65,7 +67,12 @@ namespace WpfUI.Views
                 case NativeMethods.WM_HOTKEY:
                     switch (wparam.ToInt32())
                     {
-                        case NativeMethods.HOTKEY_ID:
+                        case CLEAR_TEXT_HOTKEY_ID:
+                            (DataContext as ShellViewModel)?.ClearText();
+                            handled = true;
+                            break;
+
+                        case SET_CLIP_HOTKEY_ID:
                             (DataContext as ShellViewModel)?.SetClipboard();
                             handled = true;
                             break;
@@ -81,16 +88,18 @@ namespace WpfUI.Views
             windowHandle = new WindowInteropHelper(this).EnsureHandle();
             HwndSource.FromHwnd(windowHandle)?.AddHook(HwndHandler);
             ClipboardMonitorStart();
-            RegisterHotKey();
+            RegisterHotKeys();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            UnregisterHotKey();
+            UnregisterHotKeys();
             ClipboardMonitorStop();
             HwndSource.FromHwnd(windowHandle)?.RemoveHook(HwndHandler);
         }
 
         private IntPtr windowHandle;
+        private const int SET_CLIP_HOTKEY_ID = 9000;
+        private const int CLEAR_TEXT_HOTKEY_ID = 9001;
     }
 }

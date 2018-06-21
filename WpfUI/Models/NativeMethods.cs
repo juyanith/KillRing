@@ -9,11 +9,16 @@ namespace WpfUI.Models
 {
     internal static class NativeMethods
     {
+        public const uint MOD_ALT = 0x0001;
         public const uint MOD_CTRL = 0x0002;
         public const uint MOD_SHIFT = 0x0004;
-        public const uint VK_V = 0x0056;
+        public const uint MOD_WIN = 0x0008;
+        public const int MOD_NOREPEAT = 0x4000;
 
-        public const int HOTKEY_ID = 9000;
+        public const uint VK_V = 0x0056;
+        public const uint VK_PRINT = 0x002a;
+        public const uint VK_INSERT = 0x002d;
+        public const uint VK_DELETE = 0x002e;
 
         // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
         public const int WM_CLIPBOARDUPDATE = 0x031D;

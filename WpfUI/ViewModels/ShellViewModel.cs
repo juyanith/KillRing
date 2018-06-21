@@ -70,9 +70,10 @@ namespace WpfUI.ViewModels
 
         public bool CanClearText(string clipText) => !String.IsNullOrWhiteSpace(clipText);
 
-        public void ClearText(string clipText)
+        // clipText is needed so that it will be passed to CanClearText.
+        public void ClearText(string clipText = null)
         {
-            ClipText = null;
+            ClipText = "";
         }
 
         public void Exit()
