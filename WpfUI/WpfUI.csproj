@@ -77,8 +77,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Models\ClipboardEntry.cs" />
+    <Compile Include="Models\ClipboardEntryGroup.cs" />
     <Compile Include="Models\NativeMethods.cs" />
     <Compile Include="Models\TrayShowCommand.cs" />
+    <Compile Include="ViewModels\IDataObjectConverter.cs" />
     <Compile Include="ViewModels\DuplicateViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\DuplicateView.xaml.cs">

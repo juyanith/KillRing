@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace WpfUI.Views
         public void RegisterHotKeys()
         {
             NativeMethods.RegisterHotKey(windowHandle, CLEAR_TEXT_HOTKEY_ID, NativeMethods.MOD_ALT | NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_DELETE);
-            NativeMethods.RegisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_V);
+            NativeMethods.RegisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_INSERT);
         }
 
         public void UnregisterHotKeys()
@@ -57,9 +58,12 @@ namespace WpfUI.Views
 
         private IntPtr HwndHandler(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
         {
+            Debug.WriteLine("HwndHandler.");
+
             switch (msg)
             {
                 case NativeMethods.WM_CLIPBOARDUPDATE:
+                    Debug.WriteLine("    WM_CLIPBOARDUPDATE.");
                     (DataContext as ShellViewModel)?.ClipboardUpdated();
                     handled = false;
                     break;
@@ -68,11 +72,13 @@ namespace WpfUI.Views
                     switch (wparam.ToInt32())
                     {
                         case CLEAR_TEXT_HOTKEY_ID:
-                            (DataContext as ShellViewModel)?.ClearText();
+                            Debug.WriteLine("    CLEAR_TEXT_HOTKEY_ID.");
+                            (DataContext as ShellViewModel)?.ClearEntries();
                             handled = true;
                             break;
 
                         case SET_CLIP_HOTKEY_ID:
+                            Debug.WriteLine("    SET_CLIP_HOTKEY_ID.");
                             (DataContext as ShellViewModel)?.SetClipboard();
                             handled = true;
                             break;

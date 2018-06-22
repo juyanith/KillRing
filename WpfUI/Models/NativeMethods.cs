@@ -19,6 +19,12 @@ namespace WpfUI.Models
         public const uint VK_PRINT = 0x002a;
         public const uint VK_INSERT = 0x002d;
         public const uint VK_DELETE = 0x002e;
+        public const uint VK_LCTRL = 0x00A2;
+        public const uint VK_LALT = 0x00A4;
+        public const uint VK_LWIN = 0x005B;
+
+        const uint KEYEVENTF_EXTENDEDKEY = 0x0001; // key down
+        const uint KEYEVENTF_KEYUP = 0x0002;
 
         // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
         public const int WM_CLIPBOARDUPDATE = 0x031D;
@@ -46,5 +52,16 @@ namespace WpfUI.Models
         public static extern bool UnregisterHotKey(
             [In] IntPtr hWnd,
             [In] int id);
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+
+        public static void SendCtrlV()
+        {
+            keybd_event((byte)VK_LCTRL, 0x1d, KEYEVENTF_EXTENDEDKEY | 0, 0);
+            keybd_event((byte)VK_V, 0x2f, 0, KEYEVENTF_EXTENDEDKEY | 0);
+            keybd_event((byte)VK_V, 0x2f, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+            keybd_event((byte)VK_LCTRL, 0x1d, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        }
     }
 }

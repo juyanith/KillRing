@@ -19,32 +19,30 @@
         x:Name="ShellWindow">
     <Window.Resources>
         <model:TrayShowCommand x:Key="TrayShowCommand"/>
+        <vm:IDataObjectConverter x:Key="DataObjectConverter"/>
     </Window.Resources>
-    <Grid Margin="4">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        
-        <TextBox x:Name="ClipText" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
-                 TextWrapping="Wrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+    <DockPanel Margin="4">
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,0,0">
-            <Button x:Name="SetClipboard" Content="Set Clipboard" VerticalAlignment="Center" Padding="12,2"/>
-            <Button x:Name="ClearText" Content="Clear" VerticalAlignment="Center" Margin="12,2" Padding="12,2"/>
-            <Button x:Name="Exit" Content="Exit" VerticalAlignment="Center" Padding="12,2"/>
-        </StackPanel>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" MinWidth="8"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,0,0">
+                <Button x:Name="SetClipboard" Content="Set Clipboard" VerticalAlignment="Center" Padding="12,2"/>
+                <Button x:Name="ClearEntries" Content="Clear" VerticalAlignment="Center" Margin="12,2" Padding="12,2"/>
+                <Button x:Name="Exit" Content="Exit" VerticalAlignment="Center" Padding="12,2"/>
+            </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <Label Content="Timeout (sec)" VerticalAlignment="Center"/>
-            <TextBox x:Name="Timeout" TextAlignment="Right" VerticalAlignment="Center" Width="60"/>
-            <Label Content="Separator" VerticalAlignment="Center" Margin="8,0,0,0"/>
-            <TextBox x:Name="Separator" VerticalAlignment="Center" Width="60"/>
-        </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Content="Timeout (sec)" VerticalAlignment="Center"/>
+                <TextBox x:Name="Timeout" TextAlignment="Right" VerticalAlignment="Center" Width="60"/>
+                <Label Content="Separator" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <TextBox x:Name="Separator" VerticalAlignment="Center" Width="60"/>
+            </StackPanel>
+        </Grid>
 
         <tb:TaskbarIcon IconSource="/Icons/clipboard.ico" ToolTipText="{Binding ViewTitle}"
                         DoubleClickCommand="{StaticResource TrayShowCommand}" DoubleClickCommandParameter="{Binding ElementName=ShellWindow}">
@@ -55,5 +53,22 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-    </Grid>
+        
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" MinWidth="40"/>
+            </Grid.ColumnDefinitions>
+
+            <DataGrid Grid.Column="0" ItemsSource="{Binding ClipboardEntries}" SelectedItem="{Binding SelectedClipboardEntry}">
+
+            </DataGrid>
+
+            <TextBox Grid.Column="1" Grid.ColumnSpan="5" 
+                     Text="{Binding SelectedClipboardEntry.Data, Converter={StaticResource DataObjectConverter}}"
+                 TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+        </Grid>
+        
+    </DockPanel>
 </Window>

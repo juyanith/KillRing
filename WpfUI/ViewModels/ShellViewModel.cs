@@ -6,25 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
     public class ShellViewModel : Screen
     {
-        public string ClipText
+        public ShellViewModel()
         {
-            get { return _clipText; }
-            set
-            {
-                if (value != _clipText)
-                {
-                    _clipText = value;
-                    NotifyOfPropertyChange();
-                }
-            }
+            ClipboardEntries.CollectionChanged += ClipboardEntries_CollectionChanged;
         }
-        private string _clipText;
 
         public string Separator
         {
@@ -68,12 +60,39 @@ namespace WpfUI.ViewModels
         }
         private string _viewTitle = "Kill Ring";
 
-        public bool CanClearText(string clipText) => !String.IsNullOrWhiteSpace(clipText);
+        public BindableCollection<ClipboardEntry> ClipboardEntries { get; } = new BindableCollection<ClipboardEntry>();
 
-        // clipText is needed so that it will be passed to CanClearText.
-        public void ClearText(string clipText = null)
+        public ClipboardEntry SelectedClipboardEntry
         {
-            ClipText = "";
+            get { return _selectedClipboardEntry; }
+            set
+            {
+                if (!ReferenceEquals(value, _selectedClipboardEntry))
+                {
+                    _selectedClipboardEntry = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+        private ClipboardEntry _selectedClipboardEntry;
+
+        public bool CanClearEntries
+        {
+            get { return _canClearEntries; }
+            private set
+            {
+                if (value != _canClearEntries)
+                {
+                    _canClearEntries = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+        private bool _canClearEntries;
+
+        public void ClearEntries()
+        {
+            ClipboardEntries.Clear();
         }
 
         public void Exit()
@@ -86,36 +105,45 @@ namespace WpfUI.ViewModels
         {
             Debug.WriteLine("SetClipboard.");
 
-            setText = ClipText;
-            lastUpdateTime = DateTime.Now;
-            Clipboard.SetText(ClipText);
+
+            if (SelectedClipboardEntry != null)
+            {
+                foreach (var entry in SelectedClipboardEntry.Group)
+                {
+                    Debug.WriteLine("    SetDataObject.");
+                    setData = entry.Data;
+                    //Clipboard.SetDataObject(entry, true);
+                    NativeMethods.SendCtrlV();
+                }
+            }
         }
 
         public void ClipboardUpdated()
         {
             Debug.WriteLine("ClipboardUpdated.");
 
-            if (Clipboard.ContainsText())
+            if (setData == null || !Clipboard.IsCurrent(setData))
             {
-                var text = Clipboard.GetText();
-                Debug.WriteLine($"    text = '{text}'.");
+                Debug.WriteLine("    New DataObject.");
 
-                var now = DateTime.Now;
-
-                // If timeout expired replace clip text with current text
-                if ((now - lastUpdateTime) > TimeSpan.FromSeconds(Timeout))
+                var entry = new ClipboardEntry
                 {
-                    ClipText = text;
-                    lastUpdateTime = now;
-                    setText = null;
+                    Data = Clipboard.GetDataObject(),
+                };
+
+                var prevEntry = ClipboardEntries.LastOrDefault();
+                if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                {
+                    entry.Group = new ClipboardEntryGroup();
                 }
-                // otherwise if this is not a callback from SetClipboard append the text to clip text.
-                else if (text != setText)
+                else
                 {
-                    ClipText += (Separator + text);
-                    lastUpdateTime = now;
-                    setText = null;
-                }    
+                    entry.Group = prevEntry.Group;
+                }
+                entry.Group.Add(entry);
+
+                ClipboardEntries.Add(entry);
+                SelectedClipboardEntry = entry;
             }
         }
 
@@ -130,8 +158,12 @@ namespace WpfUI.ViewModels
             callback(allowExit); // will cancel close unless allowExit is true
         }
 
-        private DateTime lastUpdateTime = DateTime.MinValue;
-        private string setText;
+        private void ClipboardEntries_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CanClearEntries = ClipboardEntries.Count > 0;
+        }
+
         private bool allowExit;
+        private IDataObject setData;
     }
 }
