@@ -23,24 +23,21 @@
     </Window.Resources>
     <DockPanel Margin="4">
 
-        <Grid DockPanel.Dock="Bottom">
+        <Grid DockPanel.Dock="Bottom" Margin="0,4,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*" MinWidth="8"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,0,0">
-                <Button x:Name="SetClipboard" Content="Set Clipboard" VerticalAlignment="Center" Padding="12,2"/>
-                <Button x:Name="ClearEntries" Content="Clear" VerticalAlignment="Center" Margin="12,2" Padding="12,2"/>
-                <Button x:Name="Exit" Content="Exit" VerticalAlignment="Center" Padding="12,2"/>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="ClearEntries" Content="Clear" ToolTip="Clear all entries." VerticalAlignment="Center" Margin="0,0,12,0" Padding="12,2"/>
+                <Button x:Name="Exit" Content="Exit" ToolTip="Exit Kill Ring application." VerticalAlignment="Center" Padding="12,2"/>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                 <Label Content="Timeout (sec)" VerticalAlignment="Center"/>
-                <TextBox x:Name="Timeout" TextAlignment="Right" VerticalAlignment="Center" Width="60"/>
-                <Label Content="Separator" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                <TextBox x:Name="Separator" VerticalAlignment="Center" Width="60"/>
+                <TextBox x:Name="Timeout" TextAlignment="Right" Width="40" VerticalContentAlignment="Center"/>
             </StackPanel>
         </Grid>
 
@@ -63,9 +60,11 @@
                      ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}"/>
             <DockPanel Grid.Column="1">
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                    <Label Content="{Binding SelectedGroup.Entries.Count, TargetNullValue=0}" ContentStringFormat="{}{0} Entries in group"/>
+                    <Label Content="{Binding SelectedGroup.Entries.Count, TargetNullValue=0}" ContentStringFormat="{}{0} Entries"/>
                     <Label Content="Separator"/>
-                    <TextBox Text="{Binding SelectedGroup.Separator}" Width="60"/>
+                    <TextBox Text="{Binding SelectedGroup.Separator}" Width="40"/>
+                    <Button x:Name="TrimEntries" Content="Trim" ToolTip="Trim whitespace from entries." VerticalAlignment="Center" Margin="12,0" Padding="12,2"/>
+                    <Button x:Name="SetClipboard" Content="Copy" ToolTip="Join entries and copy to clipboard." VerticalAlignment="Center" Padding="12,2"/>
                 </StackPanel>
                 <ListBox ItemsSource="{Binding SelectedGroup.Entries}" HorizontalContentAlignment="Stretch" BorderThickness="0">
                     <ListBox.ItemTemplate>

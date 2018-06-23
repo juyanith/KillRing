@@ -114,6 +114,17 @@ namespace WpfUI.ViewModels
             }
         }
 
+        public void TrimEntries()
+        {
+            Debug.WriteLine("SetClipboard.");
+
+
+            foreach (var entry in SelectedGroup?.Entries)
+            {
+                entry.Text = entry.Text.Trim();
+            }
+        }
+
         public void ClipboardUpdated()
         {
             Debug.WriteLine("ClipboardUpdated.");
