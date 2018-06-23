@@ -108,13 +108,14 @@ namespace WpfUI.ViewModels
 
             if (SelectedClipboardEntry != null)
             {
+                var textEntries = new List<string>();
                 foreach (var entry in SelectedClipboardEntry.Group)
                 {
-                    Debug.WriteLine("    SetDataObject.");
-                    setData = entry.Data;
-                    //Clipboard.SetDataObject(entry, true);
-                    NativeMethods.SendCtrlV();
+                    textEntries.Add(entry.Text);
                 }
+
+                setText = string.Join(Separator, textEntries);
+                Clipboard.SetText(setText);
             }
         }
 
@@ -122,28 +123,32 @@ namespace WpfUI.ViewModels
         {
             Debug.WriteLine("ClipboardUpdated.");
 
-            if (setData == null || !Clipboard.IsCurrent(setData))
+            if (Clipboard.ContainsText())
             {
                 Debug.WriteLine("    New DataObject.");
 
-                var entry = new ClipboardEntry
+                var text = Clipboard.GetText();
+                if (text != setText)
                 {
-                    Data = Clipboard.GetDataObject(),
-                };
+                    var entry = new ClipboardEntry
+                    {
+                        Text = text,
+                    };
 
-                var prevEntry = ClipboardEntries.LastOrDefault();
-                if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
-                {
-                    entry.Group = new ClipboardEntryGroup();
-                }
-                else
-                {
-                    entry.Group = prevEntry.Group;
-                }
-                entry.Group.Add(entry);
+                    var prevEntry = ClipboardEntries.LastOrDefault();
+                    if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                    {
+                        entry.Group = new ClipboardEntryGroup();
+                    }
+                    else
+                    {
+                        entry.Group = prevEntry.Group;
+                    }
+                    entry.Group.Add(entry);
 
-                ClipboardEntries.Add(entry);
-                SelectedClipboardEntry = entry;
+                    ClipboardEntries.Add(entry);
+                    SelectedClipboardEntry = entry;
+                }
             }
         }
 
@@ -164,6 +169,6 @@ namespace WpfUI.ViewModels
         }
 
         private bool allowExit;
-        private IDataObject setData;
+        private string setText;
     }
 }

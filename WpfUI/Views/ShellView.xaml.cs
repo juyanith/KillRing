@@ -47,7 +47,7 @@ namespace WpfUI.Views
         public void RegisterHotKeys()
         {
             NativeMethods.RegisterHotKey(windowHandle, CLEAR_TEXT_HOTKEY_ID, NativeMethods.MOD_ALT | NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_DELETE);
-            NativeMethods.RegisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_INSERT);
+            NativeMethods.RegisterHotKey(windowHandle, SET_CLIP_HOTKEY_ID, NativeMethods.MOD_CTRL | NativeMethods.MOD_SHIFT | NativeMethods.MOD_NOREPEAT, NativeMethods.VK_V);
         }
 
         public void UnregisterHotKeys()
@@ -58,13 +58,11 @@ namespace WpfUI.Views
 
         private IntPtr HwndHandler(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
         {
-            Debug.WriteLine("HwndHandler.");
-
             switch (msg)
             {
                 case NativeMethods.WM_CLIPBOARDUPDATE:
                     Debug.WriteLine("    WM_CLIPBOARDUPDATE.");
-                    (DataContext as ShellViewModel)?.ClipboardUpdated();
+                    ViewModel?.ClipboardUpdated();
                     handled = false;
                     break;
 
@@ -73,13 +71,13 @@ namespace WpfUI.Views
                     {
                         case CLEAR_TEXT_HOTKEY_ID:
                             Debug.WriteLine("    CLEAR_TEXT_HOTKEY_ID.");
-                            (DataContext as ShellViewModel)?.ClearEntries();
+                            ViewModel?.ClearEntries();
                             handled = true;
                             break;
 
                         case SET_CLIP_HOTKEY_ID:
                             Debug.WriteLine("    SET_CLIP_HOTKEY_ID.");
-                            (DataContext as ShellViewModel)?.SetClipboard();
+                            ViewModel?.SetClipboard();
                             handled = true;
                             break;
                     }
@@ -108,6 +106,8 @@ namespace WpfUI.Views
         {
             ShowInTaskbar = WindowState != WindowState.Minimized;
         }
+
+        private ShellViewModel ViewModel => DataContext as ShellViewModel;
 
         private IntPtr windowHandle;
         private const int SET_CLIP_HOTKEY_ID = 9000;

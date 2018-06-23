@@ -53,22 +53,8 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-        
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*" MinWidth="40"/>
-            </Grid.ColumnDefinitions>
+        <DataGrid Grid.Column="0" ItemsSource="{Binding ClipboardEntries}" SelectedItem="{Binding SelectedClipboardEntry}"/>
 
-            <DataGrid Grid.Column="0" ItemsSource="{Binding ClipboardEntries}" SelectedItem="{Binding SelectedClipboardEntry}">
-
-            </DataGrid>
-
-            <TextBox Grid.Column="1" Grid.ColumnSpan="5" 
-                     Text="{Binding SelectedClipboardEntry.Data, Converter={StaticResource DataObjectConverter}}"
-                 TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
-        </Grid>
-        
     </DockPanel>
 </Window>

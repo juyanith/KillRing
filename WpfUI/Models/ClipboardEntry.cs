@@ -16,6 +16,6 @@ namespace WpfUI.Models
 
         public DateTime TimeStamp { get; }
         public ClipboardEntryGroup Group { get; set; }
-        public IDataObject Data { get; set; }
+        public String Text { get; set; }
     }
 }
