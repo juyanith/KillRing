@@ -15,7 +15,7 @@ namespace WpfUI.ViewModels
     {
         public ShellViewModel()
         {
-            ClipboardEntries.CollectionChanged += ClipboardEntries_CollectionChanged;
+            Groups.CollectionChanged += Groups_CollectionChanged;
         }
 
         public string Separator
@@ -60,21 +60,21 @@ namespace WpfUI.ViewModels
         }
         private string _viewTitle = "Kill Ring";
 
-        public BindableCollection<ClipboardEntry> ClipboardEntries { get; } = new BindableCollection<ClipboardEntry>();
+        public BindableCollection<StringItemGroup> Groups { get; } = new BindableCollection<StringItemGroup>();
 
-        public ClipboardEntry SelectedClipboardEntry
+        public StringItemGroup SelectedGroup
         {
-            get { return _selectedClipboardEntry; }
+            get { return _selectedGroup; }
             set
             {
-                if (!ReferenceEquals(value, _selectedClipboardEntry))
+                if (!ReferenceEquals(value, _selectedGroup))
                 {
-                    _selectedClipboardEntry = value;
+                    _selectedGroup = value;
                     NotifyOfPropertyChange();
                 }
             }
         }
-        private ClipboardEntry _selectedClipboardEntry;
+        private StringItemGroup _selectedGroup;
 
         public bool CanClearEntries
         {
@@ -92,7 +92,7 @@ namespace WpfUI.ViewModels
 
         public void ClearEntries()
         {
-            ClipboardEntries.Clear();
+            Groups.Clear();
         }
 
         public void Exit()
@@ -106,17 +106,10 @@ namespace WpfUI.ViewModels
             Debug.WriteLine("SetClipboard.");
 
 
-            if (SelectedClipboardEntry != null)
+            if (SelectedGroup != null)
             {
-                var textEntries = new List<string>();
-                foreach (var entry in SelectedClipboardEntry.Group)
-                {
-                    textEntries.Add(entry.Text);
-                }
-
                 // Keep a reference to the data object because we will get a clipboard update when it is sent to the keyboard.
-                var text = string.Join(Separator, textEntries);
-                setData = new DataObject(DataFormats.Text, text, true);
+                setData = new DataObject(DataFormats.Text, SelectedGroup.ToString(), true);
                 Clipboard.SetDataObject(setData);
             }
         }
@@ -132,26 +125,16 @@ namespace WpfUI.ViewModels
 
                 var text = Clipboard.GetText();
 
-                
-                var entry = new ClipboardEntry
-                {
-                    Text = text,
-                };
-
                 // Associate this entry with previous unless timeout has expired.
-                var prevEntry = ClipboardEntries.LastOrDefault();
-                if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                var group = Groups.LastOrDefault();
+                if (group == null || (DateTime.Now - group.TimeStamp) > TimeSpan.FromSeconds(Timeout))
                 {
-                    entry.Group = new ClipboardEntryGroup();
+                    group = new StringItemGroup();
+                    Groups.Add(group);
+                    SelectedGroup = group;
                 }
-                else
-                {
-                    entry.Group = prevEntry.Group;
-                }
-                entry.Group.Add(entry);
+                group.Add(text);
 
-                ClipboardEntries.Add(entry);
-                SelectedClipboardEntry = entry;
                 setData = null; // No need to keep reference (if any).
             }
         }
@@ -167,9 +150,9 @@ namespace WpfUI.ViewModels
             callback(allowExit); // Will cancel close unless allowExit is true.
         }
 
-        private void ClipboardEntries_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Groups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            CanClearEntries = ClipboardEntries.Count > 0;
+            CanClearEntries = Groups.Count > 0;
         }
 
         private bool allowExit;

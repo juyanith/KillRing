@@ -54,7 +54,28 @@
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
 
-        <DataGrid Grid.Column="0" ItemsSource="{Binding ClipboardEntries}" SelectedItem="{Binding SelectedClipboardEntry}"/>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox Grid.Column="0" DisplayMemberPath="TimeStamp" ItemStringFormat="HH':'mm':'ss"
+                     ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}"/>
+            <DockPanel Grid.Column="1">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <Label Content="{Binding SelectedGroup.Entries.Count, TargetNullValue=0}" ContentStringFormat="{}{0} Entries in group"/>
+                    <Label Content="Separator"/>
+                    <TextBox Text="{Binding SelectedGroup.Separator}" Width="60"/>
+                </StackPanel>
+                <ListBox ItemsSource="{Binding SelectedGroup.Entries}" HorizontalAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="0"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Grid>
 
     </DockPanel>
 </Window>
