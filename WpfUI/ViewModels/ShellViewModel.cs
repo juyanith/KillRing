@@ -114,46 +114,45 @@ namespace WpfUI.ViewModels
                     textEntries.Add(entry.Text);
                 }
 
-                // Keep a reference to the text because we will get a clipboard update when SetText is called.
-                setText = string.Join(Separator, textEntries);
-                Clipboard.SetText(setText);
+                // Keep a reference to the data object because we will get a clipboard update when it is sent to the keyboard.
+                var text = string.Join(Separator, textEntries);
+                setData = new DataObject(DataFormats.Text, text, true);
+                Clipboard.SetDataObject(setData);
             }
         }
 
         public void ClipboardUpdated()
         {
             Debug.WriteLine("ClipboardUpdated.");
-
-            if (Clipboard.ContainsText())
+            
+            // Only process text but not text we have set.
+            if ((setData == null || !Clipboard.IsCurrent(setData)) && Clipboard.ContainsText())
             {
                 Debug.WriteLine("    New DataObject.");
 
                 var text = Clipboard.GetText();
 
-                // Do not process text we have set
-                if (text != setText)
+                
+                var entry = new ClipboardEntry
                 {
-                    var entry = new ClipboardEntry
-                    {
-                        Text = text,
-                    };
+                    Text = text,
+                };
 
-                    // Associate this entry with previous unless timeout has expired.
-                    var prevEntry = ClipboardEntries.LastOrDefault();
-                    if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
-                    {
-                        entry.Group = new ClipboardEntryGroup();
-                    }
-                    else
-                    {
-                        entry.Group = prevEntry.Group;
-                    }
-                    entry.Group.Add(entry);
-
-                    ClipboardEntries.Add(entry);
-                    SelectedClipboardEntry = entry;
-                    setText = null; // no need to keep reference (if any)
+                // Associate this entry with previous unless timeout has expired.
+                var prevEntry = ClipboardEntries.LastOrDefault();
+                if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                {
+                    entry.Group = new ClipboardEntryGroup();
                 }
+                else
+                {
+                    entry.Group = prevEntry.Group;
+                }
+                entry.Group.Add(entry);
+
+                ClipboardEntries.Add(entry);
+                SelectedClipboardEntry = entry;
+                setData = null; // No need to keep reference (if any).
             }
         }
 
@@ -165,7 +164,7 @@ namespace WpfUI.ViewModels
                 allowExit = result == MessageBoxResult.OK;
             }
 
-            callback(allowExit); // will cancel close unless allowExit is true
+            callback(allowExit); // Will cancel close unless allowExit is true.
         }
 
         private void ClipboardEntries_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -174,6 +173,6 @@ namespace WpfUI.ViewModels
         }
 
         private bool allowExit;
-        private string setText;
+        private IDataObject setData;
     }
 }
