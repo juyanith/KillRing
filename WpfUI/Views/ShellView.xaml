@@ -12,7 +12,7 @@
         d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=True}"
         cal:Bind.AtDesignTime="True"
         Title="{Binding ViewTitle}" 
-        Height="300" Width="800"
+        Height="200" Width="400"
         SourceInitialized="ShellWindow_SourceInitialized"
         Closed="ShellWindow_Closed"
         StateChanged="ShellWindow_StateChanged"
@@ -53,11 +53,12 @@
 
         <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="40"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ListBox Grid.Column="0" DisplayMemberPath="TimeStamp" ItemStringFormat="HH':'mm':'ss"
-                     ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}"/>
+                     ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" 
+                     MinWidth="60"/>
             <DockPanel Grid.Column="1">
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                     <Label Content="{Binding SelectedGroup.Entries.Count, TargetNullValue=0}" ContentStringFormat="{}{0} Entries"/>

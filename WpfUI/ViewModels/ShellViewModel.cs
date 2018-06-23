@@ -17,20 +17,50 @@ namespace WpfUI.ViewModels
         {
             Groups.CollectionChanged += Groups_CollectionChanged;
         }
-
-        public string Separator
+        
+        public int MaxGroups
         {
-            get { return separator; }
+            get { return _maxGroups; }
             set
             {
-                if (value != separator)
+                if (value < 1) value = 1;
+                if (value != _maxGroups)
                 {
-                    separator = value;
+                    _maxGroups = value;
                     NotifyOfPropertyChange();
                 }
             }
         }
-        private string separator;
+        private int _maxGroups = 9;
+
+        public int MaxTextLength
+        {
+            get { return _maxTextLength; }
+            set
+            {
+                if (value < 1) value = 1;
+                if (value != _maxTextLength)
+                {
+                    _maxTextLength = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+        private int _maxTextLength = 524288; // 1 MB (512 * 1024 * 2 bytes per char)
+
+        public string Separator
+        {
+            get { return _separator; }
+            set
+            {
+                if (value != _separator)
+                {
+                    _separator = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+        private string _separator;
 
         public double Timeout
         {
@@ -44,7 +74,7 @@ namespace WpfUI.ViewModels
                 }
             }
         }
-        private double _timeout = 10.0;
+        private double _timeout = 4.0;
 
         public string ViewTitle
         {
@@ -103,9 +133,6 @@ namespace WpfUI.ViewModels
 
         public void SetClipboard()
         {
-            Debug.WriteLine("SetClipboard.");
-
-
             if (SelectedGroup != null)
             {
                 // Keep a reference to the data object because we will get a clipboard update when it is sent to the keyboard.
@@ -116,9 +143,6 @@ namespace WpfUI.ViewModels
 
         public void TrimEntries()
         {
-            Debug.WriteLine("SetClipboard.");
-
-
             foreach (var entry in SelectedGroup?.Entries)
             {
                 entry.Text = entry.Text.Trim();
@@ -127,26 +151,28 @@ namespace WpfUI.ViewModels
 
         public void ClipboardUpdated()
         {
-            Debug.WriteLine("ClipboardUpdated.");
-            
             // Only process text but not text we have set.
             if ((setData == null || !Clipboard.IsCurrent(setData)) && Clipboard.ContainsText())
             {
-                Debug.WriteLine("    New DataObject.");
+                setData = null; // No need to keep reference (if any).
 
                 var text = Clipboard.GetText();
-
-                // Associate this entry with previous unless timeout has expired.
-                var group = Groups.LastOrDefault();
-                if (group == null || (DateTime.Now - group.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                if (text.Length <= MaxTextLength)
                 {
-                    group = new StringItemGroup();
-                    Groups.Add(group);
-                    SelectedGroup = group;
+                    // Associate this entry with previous unless timeout has expired.
+                    var group = Groups.LastOrDefault();
+                    if (group == null || (DateTime.Now - group.TimeStamp) > TimeSpan.FromSeconds(Timeout))
+                    {
+                        group = new StringItemGroup();
+                        Groups.Add(group);
+                        SelectedGroup = group;
+                        if (Groups.Count > MaxGroups)
+                        {
+                            Groups.RemoveAt(0);
+                        }
+                    }
+                    group.Add(text);
                 }
-                group.Add(text);
-
-                setData = null; // No need to keep reference (if any).
             }
         }
 
