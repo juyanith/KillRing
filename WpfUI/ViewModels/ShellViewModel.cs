@@ -114,6 +114,7 @@ namespace WpfUI.ViewModels
                     textEntries.Add(entry.Text);
                 }
 
+                // Keep a reference to the text because we will get a clipboard update when SetText is called.
                 setText = string.Join(Separator, textEntries);
                 Clipboard.SetText(setText);
             }
@@ -128,6 +129,8 @@ namespace WpfUI.ViewModels
                 Debug.WriteLine("    New DataObject.");
 
                 var text = Clipboard.GetText();
+
+                // Do not process text we have set
                 if (text != setText)
                 {
                     var entry = new ClipboardEntry
@@ -135,6 +138,7 @@ namespace WpfUI.ViewModels
                         Text = text,
                     };
 
+                    // Associate this entry with previous unless timeout has expired.
                     var prevEntry = ClipboardEntries.LastOrDefault();
                     if (prevEntry == null || (DateTime.Now - prevEntry.TimeStamp) > TimeSpan.FromSeconds(Timeout))
                     {
@@ -148,6 +152,7 @@ namespace WpfUI.ViewModels
 
                     ClipboardEntries.Add(entry);
                     SelectedClipboardEntry = entry;
+                    setText = null; // no need to keep reference (if any)
                 }
             }
         }
