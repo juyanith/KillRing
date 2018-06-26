@@ -180,8 +180,12 @@ namespace WpfUI.ViewModels
         {
             if (!allowExit)
             {
-                var result = MessageBox.Show("Are you sure? This will turn off Kill Ring.\n\nClick 'OK' to exit application.", "Confirm Exit", MessageBoxButton.OKCancel);
-                allowExit = result == MessageBoxResult.OK;
+                allowExit = MessageBoxResult.Yes == MessageBox.Show(
+                    "Are you sure? This will turn off Kill Ring.\n\nClick 'Yes' to exit application.", 
+                    "Confirm Exit", 
+                    MessageBoxButton.YesNo, 
+                    MessageBoxImage.Question, 
+                    MessageBoxResult.No);
             }
 
             callback(allowExit); // Will cancel close unless allowExit is true.
