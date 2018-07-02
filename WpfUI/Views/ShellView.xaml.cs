@@ -27,11 +27,6 @@ namespace WpfUI.Views
         public ShellView()
         {
             InitializeComponent();
-
-            // Start minimized.
-            Hide();
-            WindowState = WindowState.Minimized;
-            ShowInTaskbar = false;
         }
 
         public void ClipboardMonitorStart()
@@ -87,6 +82,11 @@ namespace WpfUI.Views
             return IntPtr.Zero;
         }
 
+        private void ShellWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            ShowInTaskbar = Visibility == Visibility.Visible;
+        }
+
         private void ShellWindow_SourceInitialized(object sender, EventArgs e)
         {
             windowHandle = new WindowInteropHelper(this).EnsureHandle();
@@ -100,11 +100,6 @@ namespace WpfUI.Views
             UnregisterHotKeys();
             ClipboardMonitorStop();
             HwndSource.FromHwnd(windowHandle)?.RemoveHook(HwndHandler);
-        }
-
-        private void ShellWindow_StateChanged(object sender, EventArgs e)
-        {
-            ShowInTaskbar = WindowState != WindowState.Minimized;
         }
 
         private ShellViewModel ViewModel => DataContext as ShellViewModel;

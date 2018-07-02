@@ -23,16 +23,14 @@ namespace WpfUI.Models
         {
             if (parameter is Window window)
             {
-                if (window.WindowState == WindowState.Minimized)
+                if (window.Visibility == Visibility.Visible)
                 {
-                    window.WindowState = WindowState.Normal;
-                    window.Show();
-                    window.Activate();
+                    window.Hide();
                 }
                 else
                 {
-                    window.Hide();
-                    window.WindowState = WindowState.Minimized;
+                    window.Show();
+                    window.Activate();
                 }
             }
         }

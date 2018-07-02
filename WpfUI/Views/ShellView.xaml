@@ -15,7 +15,7 @@
         Height="200" Width="450"
         SourceInitialized="ShellWindow_SourceInitialized"
         Closed="ShellWindow_Closed"
-        StateChanged="ShellWindow_StateChanged"
+        IsVisibleChanged="ShellWindow_IsVisibleChanged"
         x:Name="ShellWindow">
     <Window.Resources>
         <model:TrayShowCommand x:Key="TrayShowCommand"/>

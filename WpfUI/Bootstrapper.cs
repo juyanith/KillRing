@@ -25,7 +25,11 @@ namespace WpfUI
             {
                 if (createdNew)
                 {
-                    DisplayRootViewFor<ShellViewModel>();
+                    DisplayRootViewFor<ShellViewModel>(new Dictionary<string, object>
+                    {
+                        { "ShowInTaskbar", false },
+                        { "Visibility", Visibility.Hidden },
+                    });
                 }
                 else // Only allow one copy of application to run
                 {
