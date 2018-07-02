@@ -30,6 +30,10 @@ namespace WpfUI.Models
                 else
                 {
                     window.Show();
+                    if (window.WindowState == WindowState.Minimized)
+                    {
+                        window.WindowState = WindowState.Normal;
+                    }
                     window.Activate();
                 }
             }

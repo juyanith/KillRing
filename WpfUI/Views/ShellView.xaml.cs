@@ -87,6 +87,11 @@ namespace WpfUI.Views
             ShowInTaskbar = Visibility == Visibility.Visible;
         }
 
+        private void ShellWindow_StateChanged(object sender, EventArgs e)
+        {
+            Visibility = WindowState == WindowState.Minimized ? Visibility.Hidden : Visibility.Visible;
+        }
+
         private void ShellWindow_SourceInitialized(object sender, EventArgs e)
         {
             windowHandle = new WindowInteropHelper(this).EnsureHandle();
